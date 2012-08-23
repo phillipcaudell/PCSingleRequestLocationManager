@@ -1,9 +1,8 @@
 //
 //  PCWebServiceLocationManager.h
-//  Glenigan
 //
 //  Created by Phillip Caudell on 23/08/2012.
-//  Copyright (c) 2012 madebyphill.co.uk. All rights reserved.
+//  Copyright (c) 2012 phillipcaudell.co.uk. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
