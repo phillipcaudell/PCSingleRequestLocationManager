@@ -19,8 +19,8 @@ I created PCSingleRequestLocationManager to act as a simple way to obtain an acc
 ---
 * Add PCSingleRequestLocationManager.h and PCSingleRequestLocationManager.m to your Xcode project.
 * Import the header file 
-```objc
-	#import <PCSingleRequestLocationManager.h>
+```
+#import <PCSingleRequestLocationManager.h>
 ```
 * Initilise a new instance of PCSingleRequestLocationManager.
 
