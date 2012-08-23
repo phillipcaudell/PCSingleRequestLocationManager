@@ -11,9 +11,9 @@ Many apps and webservices today use current location to provide customised respo
 I created PCSingleRequestLocationManager to act as a simple way to obtain an accurate CLLocation object of a users current location once the following criteria has been met:
 
 1. Vertical & horizintonol accuracy is less than 100m.
-1. The location was generated less than 10 seconds a go.
+1. The location was generated less than 10 seconds ago.
 1. We have waited a minimum amount of time (to obtain a decent reading from location manager).
-1. We haven't exceeded a maxium ammount of time.
+1. We haven't exceeded a maxium ammount of time in trying to obtain the location.
 
 ## How to use
 ---
