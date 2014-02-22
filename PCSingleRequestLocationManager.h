@@ -15,18 +15,9 @@
 
 @class PCSingleRequestLocationManager;
 
-@protocol PCSingleRequestLocationManagerDelegate <NSObject>
-
-@optional
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didGetLocation:(CLLocation *)location;
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didFailToGetLocationWithError:(NSError *)error;
-
-@end
-
 @interface PCSingleRequestLocationManager : NSObject <CLLocationManagerDelegate>
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
-@property (nonatomic, assign) id <PCSingleRequestLocationManagerDelegate> delegate;
 
 typedef void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
