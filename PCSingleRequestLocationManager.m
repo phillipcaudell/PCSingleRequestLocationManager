@@ -36,7 +36,9 @@
 
 - (void)dealloc
 {
-    
+    [self.locationManager stopUpdatingLocation];
+    self.locationManager.delegate = nil;
+    self.locationManager = nil;
 }
 
 /**
@@ -165,7 +167,6 @@
 {
     [_maxWaitTimeTimer invalidate];
     [_minWaitTimeTimer invalidate];
-    [self.locationManager stopUpdatingLocation];
     _maxWaitTimeReached = NO;
     _minWaitTimeReached = NO;
 }
