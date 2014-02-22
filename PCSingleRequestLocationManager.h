@@ -28,6 +28,8 @@
 @property (nonatomic, retain) CLLocationManager *locationManager;
 @property (nonatomic, assign) id <PCSingleRequestLocationManagerDelegate> delegate;
 
+typedef void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
+
 - (void)requestCurrentLocation;
 
 @end
