@@ -60,16 +60,13 @@
  */
 - (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
 {
+    //Copy completion block for firing later
     self.PCSingleRequestLocationCompletion = completion;
-}
-
-
-- (void)requestCurrentLocation
-{
-    // Start location manager
-    [_locationManager startUpdatingLocation];
     
-    // Start timers 
+    // Start location manager
+    [self.locationManager startUpdatingLocation];
+    
+    // Start timers
     _maxWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMaxWaitTime target:self selector:@selector(maxWaitTimeReached) userInfo:nil repeats:NO];
     _minWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMinWaitTime target:self selector:@selector(minWaitTimeReached) userInfo:nil repeats:NO];
 }
