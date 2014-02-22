@@ -155,9 +155,7 @@
     // Location settled upon!
     _locationSettledUpon = YES;
     
-    if ([_delegate respondsToSelector:@selector(singleRequestLocationManager:didGetLocation:)]) {
-        [_delegate singleRequestLocationManager:self didGetLocation:_locationManager.location];
-    }
+    self.PCSingleRequestLocationCompletion(self.locationManager.location, nil);
     
     [self cleanUp];
     
