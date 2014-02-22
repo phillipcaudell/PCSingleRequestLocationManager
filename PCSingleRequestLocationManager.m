@@ -47,8 +47,14 @@
 }
 
 /**
- Begins requesting the users current location. Delegate response will be fired once all location criteria are satisified.
+ Begins requesting the users current location. Completion will be fired once all location criteria are satisified.
  */
+- (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
+{
+    
+}
+
+
 - (void)requestCurrentLocation
 {
     // Start location manager
