@@ -15,6 +15,10 @@
 
 typedef void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
+/**
+ Requests a users current location and fires a completion block once it has established that an accurate location has been found, or that an error has occured
+ @param completion The PCSingleRequestLocationCompletion block to be fired when the manager has found or failed to find the current location
+ **/
 - (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion;
 
 @end
