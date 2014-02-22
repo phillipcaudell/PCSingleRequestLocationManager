@@ -23,24 +23,14 @@ I created PCSingleRequestLocationManager to act as a simple way to obtain an acc
 * Initialise a new instance of PCSingleRequestLocationManager.
 
 ```objc
-PCSingleRequestLocationManager *manager = [[PCSingleRequestLocationManager alloc] init];
-[manager setDelegate:self];
-[manager requestCurrentLocation];
-[manager release];
-```
-
-* Implement the PCSingleRequestLocationManagerDelegate protocol.
-
-```objc
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didGetLocation:(CLLocation *)location
-{
-	NSLog(@"Do stuff with the location: %@", location);
-}
-```
-
-```objc
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didFailToGetLocationWithError:(NSError *)error
-{
-    NSLog(@"Something went wrong with the location: %@", error);
-}
+PCSingleRequestLocationManager *manager = [PCSingleRequestLocationManager new];
+    [singleRequest requestCurrentLocationWithCompletion:^(CLLocation *location, NSError *error) {
+        
+        if(!error){
+            NSLog(@"Got current location:%@", location);
+        } else {
+           NSLog(@"Didn't get location:%@", error.localizedDescription);
+        }
+        
+    }];
 ```
