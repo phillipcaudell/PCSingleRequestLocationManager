@@ -32,5 +32,5 @@ PCSingleRequestLocationManager *manager = [PCSingleRequestLocationManager new];
            NSLog(@"Didn't get location:%@", error.localizedDescription);
         }
         
-    }];
+}];
 ```
