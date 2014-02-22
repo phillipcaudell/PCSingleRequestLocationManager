@@ -52,9 +52,6 @@
     return self;
 }
 
-/**
- Begins requesting the users current location. Completion will be fired once all location criteria are satisified.
- */
 - (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
 {
     //Copy completion block for firing later
@@ -72,14 +69,14 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    // Debug info
+    // Debug the reported location
     if (kPCWebServiceLocationManagerDebug) {
         NSLog(@"PCWebServiceLocationManager: New location: %@", newLocation);
         NSLog(@"PCWebServiceLocationManager: Horizontal accuracy: %f", newLocation.horizontalAccuracy);
         NSLog(@"PCWebServiceLocationManager: Vertical accuracy: %f", newLocation.verticalAccuracy);
     }
 
-    // If accuracy greater than 100 meters, it's probably crap
+    // If accuracy greater than 100 meters, it's too inaccurate
     if(newLocation.horizontalAccuracy > 100 && newLocation.verticalAccuracy > 100){
         if (kPCWebServiceLocationManagerDebug) {
             NSLog(@"PCWebServiceLocationManager: Accuracy poor, aborting...");
@@ -87,7 +84,7 @@
         return;
     }
     
-    // If location is older than 10 seconds, it's probably crap
+    // If location is older than 10 seconds, it's probably an old location getting re-reported
     NSInteger locationTimeIntervalSinceNow = abs([newLocation.timestamp timeIntervalSinceNow]);
     if (locationTimeIntervalSinceNow > 10) {
         if (kPCWebServiceLocationManagerDebug) {
@@ -96,7 +93,7 @@
         return;
     }
     
-    // If we haven't exceeded our min wait time, it's probably crap
+    // If we haven't exceeded our min wait time, it's probably still too inaccurate
     if (!_minWaitTimeReached) {
         if (kPCWebServiceLocationManagerDebug) {
             NSLog(@"PCWebServiceLocationManager: Min wait time not yet reached, aborting...");
@@ -110,7 +107,6 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    
     if (kPCWebServiceLocationManagerDebug) {
         NSLog(@"PCWebServiceLocationManager: Did fail with error: %@", error);
     }
