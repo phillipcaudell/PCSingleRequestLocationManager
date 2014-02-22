@@ -8,25 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-#define kPCWebServiceLocationManagerDebug NO
-#define kPCWebServiceLocationManagerMaxWaitTime 10.0
-#define kPCWebServiceLocationManagerMinWaitTime 2.0
-
+@class CLLocation;
 @class PCSingleRequestLocationManager;
 
-@protocol PCSingleRequestLocationManagerDelegate <NSObject>
+@interface PCSingleRequestLocationManager : NSObject
 
-@optional
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didGetLocation:(CLLocation *)location;
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didFailToGetLocationWithError:(NSError *)error;
+typedef void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
-@end
-
-@interface PCSingleRequestLocationManager : NSObject <CLLocationManagerDelegate>
-
-@property (nonatomic, retain) CLLocationManager *locationManager;
-@property (nonatomic, assign) id <PCSingleRequestLocationManagerDelegate> delegate;
-
-- (void)requestCurrentLocation;
+- (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion;
 
 @end

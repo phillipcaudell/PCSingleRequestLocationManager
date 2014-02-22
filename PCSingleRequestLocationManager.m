@@ -7,8 +7,13 @@
 //
 
 #import "PCSingleRequestLocationManager.h"
+#import <CoreLocation/CoreLocation.h>
 
-@interface PCSingleRequestLocationManager()
+#define kPCWebServiceLocationManagerDebug NO
+#define kPCWebServiceLocationManagerMaxWaitTime 10.0
+#define kPCWebServiceLocationManagerMinWaitTime 2.0
+
+@interface PCSingleRequestLocationManager() <CLLocationManagerDelegate>
 {
     BOOL _maxWaitTimeReached;
     BOOL _minWaitTimeReached;
@@ -16,6 +21,9 @@
     NSTimer *_maxWaitTimeTimer;
     NSTimer *_minWaitTimeTimer;
 }
+
+@property (nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic, copy) void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
 - (void)maxWaitTimeReached;
 - (void)minWaitTimeReached;
@@ -28,38 +36,39 @@
 
 - (void)dealloc
 {
-    [_locationManager release];
-    [super dealloc];
+    [self.locationManager stopUpdatingLocation];
+    self.locationManager.delegate = nil;
+    self.locationManager = nil;
 }
 
 /**
- Creates new instance of PCWebServiceLocationManager.
+ Creates new instance of PCSingleRequestLocationManager.
  */
 - (id)init
 {
     self = [super init];
     if (self){
         
-        // Hold onto ourselves until we have a result
-        [self retain];
-        
-        _locationManager = [[CLLocationManager alloc] init];
-        _locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-        _locationManager.delegate = self;
+        self.locationManager = [[CLLocationManager alloc] init];
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+        self.locationManager.delegate = self;
         
     }
     return self;
 }
 
 /**
- Begins requesting the users current location. Delegate response will be fired once all location criteria are satisified.
+ Begins requesting the users current location. Completion will be fired once all location criteria are satisified.
  */
-- (void)requestCurrentLocation
+- (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
 {
-    // Start location manager
-    [_locationManager startUpdatingLocation];
+    //Copy completion block for firing later
+    self.PCSingleRequestLocationCompletion = completion;
     
-    // Start timers 
+    // Start location manager
+    [self.locationManager startUpdatingLocation];
+    
+    // Start timers
     _maxWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMaxWaitTime target:self selector:@selector(maxWaitTimeReached) userInfo:nil repeats:NO];
     _minWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMinWaitTime target:self selector:@selector(minWaitTimeReached) userInfo:nil repeats:NO];
 }
@@ -106,15 +115,13 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    if ([_delegate respondsToSelector:@selector(singleRequestLocationManager:didFailToGetLocationWithError:)]) {
-        
-        if (kPCWebServiceLocationManagerDebug) {
-            NSLog(@"PCWebServiceLocationManager: Did fail with error: %@", error);
-        }
-        
-        [_delegate singleRequestLocationManager:self didFailToGetLocationWithError:error];
-        
+    
+    if (kPCWebServiceLocationManagerDebug) {
+        NSLog(@"PCWebServiceLocationManager: Did fail with error: %@", error);
     }
+    
+    self.PCSingleRequestLocationCompletion(nil, error);
+        
     [self cleanUp];
 }
 
@@ -150,9 +157,7 @@
     // Location settled upon!
     _locationSettledUpon = YES;
     
-    if ([_delegate respondsToSelector:@selector(singleRequestLocationManager:didGetLocation:)]) {
-        [_delegate singleRequestLocationManager:self didGetLocation:_locationManager.location];
-    }
+    self.PCSingleRequestLocationCompletion(self.locationManager.location, nil);
     
     [self cleanUp];
     
@@ -162,10 +167,8 @@
 {
     [_maxWaitTimeTimer invalidate];
     [_minWaitTimeTimer invalidate];
-    [_locationManager stopUpdatingLocation];
-    
-    // Sent our result, we're outta here...
-    [self release];
+    _maxWaitTimeReached = NO;
+    _minWaitTimeReached = NO;
 }
 
 @end
