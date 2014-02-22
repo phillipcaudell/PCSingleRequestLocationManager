@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreLocation/CoreLocation.h>
 
 #define kPCWebServiceLocationManagerDebug NO
 #define kPCWebServiceLocationManagerMaxWaitTime 10.0
