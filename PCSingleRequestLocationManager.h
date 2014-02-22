@@ -30,6 +30,6 @@
 
 typedef void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
-- (void)requestCurrentLocation;
+- (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion;
 
 @end
