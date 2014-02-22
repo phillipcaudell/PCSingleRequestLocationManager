@@ -165,8 +165,9 @@
 {
     [_maxWaitTimeTimer invalidate];
     [_minWaitTimeTimer invalidate];
-    [_locationManager stopUpdatingLocation];
-    
+    [self.locationManager stopUpdatingLocation];
+    _maxWaitTimeReached = NO;
+    _minWaitTimeReached = NO;
 }
 
 @end
