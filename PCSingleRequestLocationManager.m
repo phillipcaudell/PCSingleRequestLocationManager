@@ -113,15 +113,13 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    if ([_delegate respondsToSelector:@selector(singleRequestLocationManager:didFailToGetLocationWithError:)]) {
-        
-        if (kPCWebServiceLocationManagerDebug) {
-            NSLog(@"PCWebServiceLocationManager: Did fail with error: %@", error);
-        }
-        
-        [_delegate singleRequestLocationManager:self didFailToGetLocationWithError:error];
-        
+    
+    if (kPCWebServiceLocationManagerDebug) {
+        NSLog(@"PCWebServiceLocationManager: Did fail with error: %@", error);
     }
+    
+    self.PCSingleRequestLocationCompletion(nil, error);
+        
     [self cleanUp];
 }
 
