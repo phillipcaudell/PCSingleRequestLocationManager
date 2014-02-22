@@ -28,8 +28,6 @@
 
 - (void)dealloc
 {
-    [_locationManager release];
-    [super dealloc];
 }
 
 /**
@@ -41,7 +39,6 @@
     if (self){
         
         // Hold onto ourselves until we have a result
-        [self retain];
         
         _locationManager = [[CLLocationManager alloc] init];
         _locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
@@ -164,8 +161,6 @@
     [_minWaitTimeTimer invalidate];
     [_locationManager stopUpdatingLocation];
     
-    // Sent our result, we're outta here...
-    [self release];
 }
 
 @end
