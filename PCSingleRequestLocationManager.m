@@ -25,11 +25,6 @@
 @property (nonatomic, retain) CLLocationManager *locationManager;
 @property (nonatomic, copy) void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
-- (void)maxWaitTimeReached;
-- (void)minWaitTimeReached;
-- (void)settleUponCurrentLocation;
-- (void)cleanUp;
-
 @end;
 
 @implementation PCSingleRequestLocationManager
