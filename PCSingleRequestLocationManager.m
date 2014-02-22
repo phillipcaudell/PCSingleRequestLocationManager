@@ -38,8 +38,6 @@
     self = [super init];
     if (self){
         
-        // Hold onto ourselves until we have a result
-        
         _locationManager = [[CLLocationManager alloc] init];
         _locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
         _locationManager.delegate = self;
