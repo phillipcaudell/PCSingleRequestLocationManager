@@ -17,6 +17,8 @@
     NSTimer *_minWaitTimeTimer;
 }
 
+@property (nonatomic, copy) void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
+
 - (void)maxWaitTimeReached;
 - (void)minWaitTimeReached;
 - (void)settleUponCurrentLocation;
@@ -28,6 +30,7 @@
 
 - (void)dealloc
 {
+    
 }
 
 /**
@@ -51,7 +54,7 @@
  */
 - (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
 {
-    
+    self.PCSingleRequestLocationCompletion = completion;
 }
 
 
