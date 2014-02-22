@@ -24,7 +24,7 @@ I created PCSingleRequestLocationManager to act as a simple way to obtain an acc
 
 ```objc
 PCSingleRequestLocationManager *manager = [PCSingleRequestLocationManager new];
-    [singleRequest requestCurrentLocationWithCompletion:^(CLLocation *location, NSError *error) {
+[singleRequest requestCurrentLocationWithCompletion:^(CLLocation *location, NSError *error) {
         
         if(!error){
             NSLog(@"Got current location:%@", location);
