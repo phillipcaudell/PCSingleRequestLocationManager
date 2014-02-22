@@ -7,8 +7,13 @@
 //
 
 #import "PCSingleRequestLocationManager.h"
+#import <CoreLocation/CoreLocation.h>
 
-@interface PCSingleRequestLocationManager()
+#define kPCWebServiceLocationManagerDebug NO
+#define kPCWebServiceLocationManagerMaxWaitTime 10.0
+#define kPCWebServiceLocationManagerMinWaitTime 2.0
+
+@interface PCSingleRequestLocationManager() <CLLocationManagerDelegate>
 {
     BOOL _maxWaitTimeReached;
     BOOL _minWaitTimeReached;
@@ -17,6 +22,7 @@
     NSTimer *_minWaitTimeTimer;
 }
 
+@property (nonatomic, retain) CLLocationManager *locationManager;
 @property (nonatomic, copy) void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
 - (void)maxWaitTimeReached;
@@ -34,16 +40,16 @@
 }
 
 /**
- Creates new instance of PCWebServiceLocationManager.
+ Creates new instance of PCSingleRequestLocationManager.
  */
 - (id)init
 {
     self = [super init];
     if (self){
         
-        _locationManager = [[CLLocationManager alloc] init];
-        _locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-        _locationManager.delegate = self;
+        self.locationManager = [[CLLocationManager alloc] init];
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+        self.locationManager.delegate = self;
         
     }
     return self;
