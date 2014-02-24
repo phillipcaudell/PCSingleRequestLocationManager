@@ -7,8 +7,13 @@
 //
 
 #import "PCSingleRequestLocationManager.h"
+#import <CoreLocation/CoreLocation.h>
 
-@interface PCSingleRequestLocationManager()
+#define kPCWebServiceLocationManagerDebug NO
+#define kPCWebServiceLocationManagerMaxWaitTime 10.0
+#define kPCWebServiceLocationManagerMinWaitTime 2.0
+
+@interface PCSingleRequestLocationManager() <CLLocationManagerDelegate>
 {
     BOOL _maxWaitTimeReached;
     BOOL _minWaitTimeReached;
@@ -17,10 +22,8 @@
     NSTimer *_minWaitTimeTimer;
 }
 
-- (void)maxWaitTimeReached;
-- (void)minWaitTimeReached;
-- (void)settleUponCurrentLocation;
-- (void)cleanUp;
+@property (nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic, copy) void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
 @end;
 
@@ -28,38 +31,36 @@
 
 - (void)dealloc
 {
-    [_locationManager release];
-    [super dealloc];
+    [self.locationManager stopUpdatingLocation];
+    self.locationManager.delegate = nil;
+    self.locationManager = nil;
 }
 
 /**
- Creates new instance of PCWebServiceLocationManager.
+ Creates new instance of PCSingleRequestLocationManager.
  */
 - (id)init
 {
     self = [super init];
     if (self){
         
-        // Hold onto ourselves until we have a result
-        [self retain];
-        
-        _locationManager = [[CLLocationManager alloc] init];
-        _locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-        _locationManager.delegate = self;
+        self.locationManager = [[CLLocationManager alloc] init];
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+        self.locationManager.delegate = self;
         
     }
     return self;
 }
 
-/**
- Begins requesting the users current location. Delegate response will be fired once all location criteria are satisified.
- */
-- (void)requestCurrentLocation
+- (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
 {
-    // Start location manager
-    [_locationManager startUpdatingLocation];
+    //Copy completion block for firing later
+    self.PCSingleRequestLocationCompletion = completion;
     
-    // Start timers 
+    // Start location manager
+    [self.locationManager startUpdatingLocation];
+    
+    // Start timers
     _maxWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMaxWaitTime target:self selector:@selector(maxWaitTimeReached) userInfo:nil repeats:NO];
     _minWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMinWaitTime target:self selector:@selector(minWaitTimeReached) userInfo:nil repeats:NO];
 }
@@ -68,14 +69,14 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    // Debug info
+    // Debug the reported location
     if (kPCWebServiceLocationManagerDebug) {
         NSLog(@"PCWebServiceLocationManager: New location: %@", newLocation);
         NSLog(@"PCWebServiceLocationManager: Horizontal accuracy: %f", newLocation.horizontalAccuracy);
         NSLog(@"PCWebServiceLocationManager: Vertical accuracy: %f", newLocation.verticalAccuracy);
     }
 
-    // If accuracy greater than 100 meters, it's probably crap
+    // If accuracy greater than 100 meters, it's too inaccurate
     if(newLocation.horizontalAccuracy > 100 && newLocation.verticalAccuracy > 100){
         if (kPCWebServiceLocationManagerDebug) {
             NSLog(@"PCWebServiceLocationManager: Accuracy poor, aborting...");
@@ -83,7 +84,7 @@
         return;
     }
     
-    // If location is older than 10 seconds, it's probably crap
+    // If location is older than 10 seconds, it's probably an old location getting re-reported
     NSInteger locationTimeIntervalSinceNow = abs([newLocation.timestamp timeIntervalSinceNow]);
     if (locationTimeIntervalSinceNow > 10) {
         if (kPCWebServiceLocationManagerDebug) {
@@ -92,7 +93,7 @@
         return;
     }
     
-    // If we haven't exceeded our min wait time, it's probably crap
+    // If we haven't exceeded our min wait time, it's probably still too inaccurate
     if (!_minWaitTimeReached) {
         if (kPCWebServiceLocationManagerDebug) {
             NSLog(@"PCWebServiceLocationManager: Min wait time not yet reached, aborting...");
@@ -106,15 +107,12 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    if ([_delegate respondsToSelector:@selector(singleRequestLocationManager:didFailToGetLocationWithError:)]) {
-        
-        if (kPCWebServiceLocationManagerDebug) {
-            NSLog(@"PCWebServiceLocationManager: Did fail with error: %@", error);
-        }
-        
-        [_delegate singleRequestLocationManager:self didFailToGetLocationWithError:error];
-        
+    if (kPCWebServiceLocationManagerDebug) {
+        NSLog(@"PCWebServiceLocationManager: Did fail with error: %@", error);
     }
+    
+    self.PCSingleRequestLocationCompletion(nil, error);
+        
     [self cleanUp];
 }
 
@@ -150,9 +148,7 @@
     // Location settled upon!
     _locationSettledUpon = YES;
     
-    if ([_delegate respondsToSelector:@selector(singleRequestLocationManager:didGetLocation:)]) {
-        [_delegate singleRequestLocationManager:self didGetLocation:_locationManager.location];
-    }
+    self.PCSingleRequestLocationCompletion(self.locationManager.location, nil);
     
     [self cleanUp];
     
@@ -162,10 +158,8 @@
 {
     [_maxWaitTimeTimer invalidate];
     [_minWaitTimeTimer invalidate];
-    [_locationManager stopUpdatingLocation];
-    
-    // Sent our result, we're outta here...
-    [self release];
+    _maxWaitTimeReached = NO;
+    _minWaitTimeReached = NO;
 }
 
 @end

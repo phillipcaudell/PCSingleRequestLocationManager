@@ -8,25 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-#define kPCWebServiceLocationManagerDebug NO
-#define kPCWebServiceLocationManagerMaxWaitTime 10.0
-#define kPCWebServiceLocationManagerMinWaitTime 2.0
-
+@class CLLocation;
 @class PCSingleRequestLocationManager;
 
-@protocol PCSingleRequestLocationManagerDelegate <NSObject>
+@interface PCSingleRequestLocationManager : NSObject
 
-@optional
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didGetLocation:(CLLocation *)location;
-- (void)singleRequestLocationManager:(PCSingleRequestLocationManager *)manager didFailToGetLocationWithError:(NSError *)error;
+typedef void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
-@end
-
-@interface PCSingleRequestLocationManager : NSObject <CLLocationManagerDelegate>
-
-@property (nonatomic, retain) CLLocationManager *locationManager;
-@property (nonatomic, assign) id <PCSingleRequestLocationManagerDelegate> delegate;
-
-- (void)requestCurrentLocation;
+/**
+ Requests a users current location and fires a completion block once it has established that an accurate location has been found, or that an error has occured
+ @param completion The PCSingleRequestLocationCompletion block to be fired when the manager has found or failed to find the current location
+ **/
+- (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion;
 
 @end
