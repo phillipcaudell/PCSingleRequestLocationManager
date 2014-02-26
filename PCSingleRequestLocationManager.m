@@ -31,7 +31,6 @@
 
 - (void)dealloc
 {
-    [self.locationManager stopUpdatingLocation];
     self.locationManager.delegate = nil;
     self.locationManager = nil;
 }
@@ -156,10 +155,14 @@
 
 - (void)cleanUp
 {
-    [_maxWaitTimeTimer invalidate];
-    [_minWaitTimeTimer invalidate];
-    _maxWaitTimeReached = NO;
-    _minWaitTimeReached = NO;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.locationManager stopUpdatingLocation];
+        [_maxWaitTimeTimer invalidate];
+        [_minWaitTimeTimer invalidate];
+        _maxWaitTimeReached = NO;
+        _minWaitTimeReached = NO;
+    }];
+
 }
 
 @end
